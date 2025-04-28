@@ -9,7 +9,6 @@ from sqlmodel import (
     Field,
     Session,
     SQLModel,
-    JSON,
     create_engine,
     select,
     TIMESTAMP,
@@ -20,23 +19,19 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "AIPEX2025")
 
 
 class ResultBase(SQLModel):
-    user: str = Field(index=True)
+    origin: str = Field(index=True)
     label: str = Field(index=True)
-    data: str = Field(
-        sa_column=Column(
-            JSON,
-            nullable=False,
-        )
-    )
+    value: float
 
 
 class Result(ResultBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    date: datetime | None = Field(
+    last_updated: datetime | None = Field(
         sa_column=Column(
             TIMESTAMP(timezone=True),
             nullable=False,
             server_default=text("CURRENT_TIMESTAMP"),
+            onupdate=text("CURRENT_TIMESTAMP"),
         ),
         default=None,
     )
@@ -48,7 +43,7 @@ class ResultCreate(ResultBase):
 
 class ResultPublic(ResultBase):
     id: int
-    date: datetime
+    last_updated: datetime
 
 
 sqlite_file_name = "database.db"
@@ -95,10 +90,23 @@ def create_result(
     if access_token != ACCESS_TOKEN:
         raise HTTPException(status_code=403, detail="Invalid access token")
     db_result = Result.model_validate(result)
-    session.add(db_result)
-    session.commit()
-    session.refresh(db_result)
-    return db_result
+    existing_result = session.exec(
+        select(Result).where(
+            Result.origin == db_result.origin,
+            Result.label == db_result.label,
+        )
+    ).first()
+    if existing_result:
+        existing_result.value = db_result.value
+        session.add(existing_result)
+        session.commit()
+        session.refresh(existing_result)
+        return existing_result
+    else:
+        session.add(db_result)
+        session.commit()
+        session.refresh(db_result)
+        return db_result
 
 
 @app.get("/results/")
@@ -114,7 +122,7 @@ def read_results(
         statement = statement.where(Result.label == label)
     if maxAgeMin is not None:
         max_age = datetime.now(timezone.utc) - timedelta(minutes=maxAgeMin)
-        statement = statement.where(Result.date >= max_age)
+        statement = statement.where(Result.last_updated >= max_age)
     results = session.exec(statement.offset(offset).limit(limit))
     return results
 
