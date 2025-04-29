@@ -1,5 +1,7 @@
 <script lang="ts">
 	import * as d3 from 'd3';
+	import { flip } from 'svelte/animate';
+	import { fade } from 'svelte/transition';
 
 	type Data = {
 		label: string;
@@ -10,8 +12,8 @@
 	export let data: Data[] = [];
 
 	// The chart dimensions and margins as optional props.
-	export let width = 928;
-	export let height = 500;
+	let width = 1800;
+	export let height = 600;
 	export let marginTop = 30;
 	export let marginRight = 30;
 	export let marginBottom = 30;
@@ -36,20 +38,55 @@
 		.scaleLinear()
 		.domain([0, 100])
 		.range([height - marginBottom, marginTop]);
+
+	const boschColors = [
+		'#007BC0', // Blue 50
+		'#9E2896', // Purple 40
+		'#004975', // Blue 30
+		'#009B77', // Turquoise 50
+		'#0A4F4B', // Turquoise 30
+		'#00884A' // Green 50
+	];
+	const boschBlueColors = [
+		'#b8d6ff', // Blue 85
+		'#9dc9ff', // Blue 80
+		'#7ebdff', // Blue 75
+		'#56b0ff', // Blue 70
+		'#00a4fd', // Blue 65
+		'#0096e8', // Blue 60
+		'#0088d4', // Blue 55
+		'#007bc0', // Blue 50
+		'#006ead', // Blue 45
+		'#00629a', // Blue 40
+		'#005587', // Blue 35
+		'#004975', // Blue 30
+		'#003e64', // Blue 25
+		'#003253', // Blue 20
+		'#002742' // Blue 15
+	];
+	function colorFromLabel(label: string) {
+		const weights = [3, 1, 5, 2, 4, 6, 7, 8, 9, 10];
+		const chars = label.split('').map((l, i) => l.charCodeAt(0) * weights[i % weights.length]);
+		const charSum = chars.reduce((a, b) => a + b, 0);
+		const color = boschBlueColors[charSum % Object.keys(boschBlueColors).length];
+		return color;
+	}
 </script>
 
-<svg {width} {height} viewBox="0 0 {width} {height}" style:max-width="100%" style:height="auto">
+<svg viewBox="0 0 {width} {height}" style:display="block" bind:clientWidth={width}>
 	<!--Add a rect for each bar. -->
-	<g fill="steelblue">
-		{#each data as d}
-			<rect
-				x={xScale(d.label)}
-				y={yScale(d.value)}
-				height={yScale(0) - yScale(d.value)}
-				width={xScale.bandwidth()}
-			/>
-		{/each}
-	</g>
+	{#each data as d (d.label)}
+		<rect
+			style:transition="all 0.5s ease-out"
+			transition:fade
+			animate:flip
+			fill={colorFromLabel(d.label)}
+			x={xScale(d.label)}
+			y={yScale(d.value)}
+			height={yScale(0) - yScale(d.value)}
+			width={xScale.bandwidth()}
+		/>
+	{/each}
 
 	<!--X - Axis-->
 	<g transform="translate(0,{height - marginBottom})">

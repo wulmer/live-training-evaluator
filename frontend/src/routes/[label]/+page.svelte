@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { backendUrlStore } from '$lib/config.svelte';
+	import { backendUrlStore, timeSpanMin } from '$lib/config.svelte';
 	import { page } from '$app/state';
 
 	import BarChart from '$lib/BarChart.svelte';
@@ -22,32 +22,35 @@
 		let res: Response;
 		try {
 			const fetchURL = new URL(`${$backendUrlStore}/results/`);
-			fetchURL.searchParams.set('maxAgeMin', '300000');
+			fetchURL.searchParams.set('maxAgeMin', $timeSpanMin.toString());
+			fetchURL.searchParams.set('label', page.params.label);
 			console.log('Fetching data from backend...', fetchURL.toString());
 			res = await fetch(fetchURL);
 		} catch (error) {
 			console.error('Error fetching data:', error);
-			setTimeout(updateResults, 5000);
 			return;
 		}
 		const json: ResultData[] = await res.json();
 
-		data = json
-			.filter((d) => d.label === page.params.label)
-			.map((d) => ({
-				label: `${d.origin}`,
-				value: Math.floor(d.value * 100)
-			}));
-
-		setTimeout(updateResults, 2000);
+		data = json.map((d) => ({
+			label: `${d.origin}`,
+			value: Math.floor(d.value * 100)
+		}));
 	}
 
 	onMount(() => {
 		data = [];
 		updateResults();
-
-		setTimeout(updateResults, 2000);
+		const timer = setInterval(() => {
+			updateResults();
+		}, 1000);
+		return () => {
+			clearInterval(timer);
+		};
 	});
 </script>
 
-<BarChart {data} />
+<section class="section">
+	<h1 class="title">Evaluation: {page.params.label}</h1>
+	<BarChart {data} />
+</section>
