@@ -41,7 +41,7 @@
 					id="inputUrl"
 					bind:value={$backendUrlStore}
 					type="text"
-					placeholder="Backend Server"
+					placeholder="Please enter backend URL (http://someserver.westeurope.azurecontainer.io:8000)"
 				/>
 			</div>
 		</div>
