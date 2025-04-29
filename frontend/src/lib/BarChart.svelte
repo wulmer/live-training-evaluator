@@ -1,49 +1,49 @@
 <script lang="ts">
-import * as d3 from "d3";
+	import * as d3 from 'd3';
 
-type Data = {
-	label: string;
-	value: number;
-};
+	type Data = {
+		label: string;
+		value: number;
+	};
 
-// Receive plot data as prop.
-export let data: Data[] = [];
+	// Receive plot data as prop.
+	export let data: Data[] = [];
 
-// The chart dimensions and margins as optional props.
-export let width = 928;
-export let height = 500;
-export let marginTop = 30;
-export let marginRight = 30;
-export let marginBottom = 30;
-export let marginLeft = 50;
+	// The chart dimensions and margins as optional props.
+	export let width = 928;
+	export let height = 500;
+	export let marginTop = 30;
+	export let marginRight = 30;
+	export let marginBottom = 30;
+	export let marginLeft = 50;
 
-// Create the x (horizontal position) scale.
-$: xScale = d3
-	.scaleBand()
-	.domain(
-		// Sort the data in descending value
-		d3.groupSort(
-			data,
-			([d]) => d.label,
-			(d) => d.label,
-		),
-	)
-	.range([marginLeft, width - marginRight])
-	.padding(0.1);
+	// Create the x (horizontal position) scale.
+	$: xScale = d3
+		.scaleBand()
+		.domain(
+			// Sort the data in descending value
+			d3.groupSort(
+				data,
+				([d]) => d.label,
+				(d) => d.label
+			)
+		)
+		.range([marginLeft, width - marginRight])
+		.padding(0.1);
 
-// Create the y (vertical position) scale.
-$: yScale = d3
-	.scaleLinear()
-	.domain([0, 100])
-	.range([height - marginBottom, marginTop]);
+	// Create the y (vertical position) scale.
+	$: yScale = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
 </script>
 
 <svg {width} {height} viewBox="0 0 {width} {height}" style:max-width="100%" style:height="auto">
 	<!--Add a rect for each bar. -->
 	<g fill="steelblue">
 		{#each data as d}
-			<rect 
-        x={xScale(d.label)}
+			<rect
+				x={xScale(d.label)}
 				y={yScale(d.value)}
 				height={yScale(0) - yScale(d.value)}
 				width={xScale.bandwidth()}
@@ -93,7 +93,7 @@ $: yScale = d3
 
 			<!--Y - Axis Tick Labels-->
 			<text
-			  fill="currentColor"
+				fill="currentColor"
 				text-anchor="end"
 				dominant-baseline="middle"
 				x={-9}
