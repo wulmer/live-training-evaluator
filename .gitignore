@@ -12,3 +12,5 @@ backend/database.db
 
 # Secrets
 .envrc
+backend/.deployed-hostname.txt
+backend/.secret-acr-token
