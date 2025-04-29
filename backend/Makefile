@@ -7,6 +7,23 @@ IMAGE_TAG=latest
 
 SHELL=bash
 
+help:
+	@echo "Makefile for managing the backend application"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make <target>"
+	@echo ""
+	@echo "Targets:"
+	@echo "  help            Show this help message"
+	@echo "  dev             Run the application in development mode"
+	@echo "  format          Format the code using ruff"
+	@echo "  docker-build    Build the Docker image"
+	@echo "  docker-run      Run the Docker container"
+	@echo "  docker-push     Push the Docker image to Azure Container Registry"
+	@echo "  logs            Show logs of the Azure Container Instance"
+	@echo "  deploy          Deploy the application to Azure Container Instance"
+	@echo "  delete          Delete the Azure Container Instance and Resource Group"
+
 dev:
 	uv run uvicorn app.main:app --reload
 

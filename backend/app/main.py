@@ -112,7 +112,7 @@ def create_result(
 @app.get("/results/")
 def read_results(
     session: SessionDep,
-    label: str = None,
+    label: str | None = None,
     maxAgeMin: int = 30,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
