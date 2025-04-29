@@ -1,0 +1,5 @@
+.venv
+database.db
+Makefile
+__pycache__
+*.pyc
