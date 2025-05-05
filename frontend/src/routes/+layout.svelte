@@ -2,7 +2,11 @@
 	import type { LayoutProps } from './$types';
 	import { backendUrlStore, timeSpanMin } from '$lib/config.svelte';
 
-	let { children }: LayoutProps = $props();
+	let { children, data }: LayoutProps = $props();
+
+	if (data.backendUrl && data.backendUrl !== '') {
+		backendUrlStore.set(`http://${data.backendUrl}:8000`);
+	}
 </script>
 
 <section class="hero is-small">
