@@ -1,8 +1,10 @@
-AZURE_RESOURCE_GROUP=ulw2si-lte-backend-rg
-AZURE_CONTAINER_NAME=ulw2si-lte-backend-container
+PERSON?=${USER}
+RANDOM=$(shell echo ${PERSON} | md5sum | cut -c 1-8)
+AZURE_RESOURCE_GROUP=${PERSON}-lte-backend-rg
+AZURE_CONTAINER_NAME=${PERSON}-lte-backend-container
 AZURE_LOCATION=WestEurope
-AZURE_CONTAINER_REGISTRY=ulw2silteacr
-AZURE_ACR_USERNAME=ulw2siltetoken
+AZURE_CONTAINER_REGISTRY=${PERSON}lteacr
+AZURE_ACR_USERNAME=${PERSON}ltetoken
 AZURE_ACR_TOKEN=#will-be-read-from-file-after-docker-push
 AZURE_ACR_TOKEN_FILE=.secret-acr-token
 IMAGE_NAME=lte-backend
@@ -78,7 +80,7 @@ deploy:
 		--memory 1.5 \
 		--ports 8000 \
 		--ip-address public \
-		--dns-name-label ${AZURE_CONTAINER_NAME}-$${RANDOM} \
+		--dns-name-label ${AZURE_CONTAINER_NAME}-${RANDOM} \
 		--environment-variables AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING} \
 		--restart-policy OnFailure \
 		--output tsv \
