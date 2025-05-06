@@ -3,6 +3,8 @@
 	import { backendUrlStore, timeSpanMin } from '$lib/config.svelte';
 
 	$: currentLabels = [] as string[];
+	$: successfulConnection = false;
+	$: connectionStatus = 0;
 
 	async function updateLabels() {
 		let res: Response;
@@ -11,8 +13,12 @@
 			fetchURL.searchParams.set('maxAgeMin', $timeSpanMin.toString());
 			console.log('Fetching data from backend...', fetchURL.toString());
 			res = await fetch(fetchURL);
+			successfulConnection = res.ok;
+			connectionStatus = res.status;
 		} catch (error) {
 			console.error('Error fetching data:', error);
+			successfulConnection = false;
+			connectionStatus = 0;
 			return;
 		}
 		const json = await res.json();
@@ -37,7 +43,14 @@
 <section class="section">
 	<h1 class="title">Available evaluations</h1>
 	<p class="subtitle">Click on a label to see the evaluation.</p>
-	{#if currentLabels.length === 0}
+	{#if !successfulConnection}
+		<div class="notification is-warning">
+			<p>Could not connect to the backend. Please check your connection.</p>
+			{#if connectionStatus !== 0}
+				<p>Status code: {connectionStatus}</p>
+			{/if}
+		</div>
+	{:else if currentLabels.length === 0}
 		<p>No evaluations available.</p>
 	{:else}
 		<div class="field is-grouped">
