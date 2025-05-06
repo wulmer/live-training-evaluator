@@ -28,8 +28,13 @@ help:
 	@echo "  docker-push     Build and push the Docker image to Azure Container Registry"
 	@echo "  deploy          Deploy the application to Azure Container Instance"
 	@echo "  logs            Show logs of the Azure Container Instance"
+	@echo "  restart				 Restart the Azure Container Instance"
 	@echo "  swagger-url     Show the Swagger and Redoc URLs"
 	@echo "  delete          Delete the Azure Container Instance and Resource Group"
+	@echo ""
+	@echo "If you want to deploy the application, you need to run these two steps:"
+	@echo "  1. make docker-push"
+	@echo "  2. make deploy"
 
 dev:
 	uv run uvicorn app.main:app --reload
@@ -91,6 +96,11 @@ logs:
 		--resource-group ${AZURE_RESOURCE_GROUP} \
 		--name ${AZURE_CONTAINER_NAME} \
 		--follow
+
+restart:
+	az container restart \
+		--resource-group ${AZURE_RESOURCE_GROUP} \
+		--name ${AZURE_CONTAINER_NAME}
 
 swagger-url:
 	@echo "Swagger URL: http://$$(cat ${DEPLOYED_HOSTNAME}):8000/docs"
