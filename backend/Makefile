@@ -56,8 +56,15 @@ docker-push: docker-build
 		--resource-group ${AZURE_RESOURCE_GROUP} \
 		--name ${AZURE_CONTAINER_REGISTRY} \
 		--sku Basic
-	az acr login \
-		--name ${AZURE_CONTAINER_REGISTRY}
+	if command -v podman &> /dev/null ; then \
+		podman login \
+			${AZURE_CONTAINER_REGISTRY}.azurecr.io \
+			-u 00000000-0000-0000-0000-000000000000 \
+			-p "$$(az acr login --name ${AZURE_CONTAINER_REGISTRY} --expose-token -o tsv --query accessToken)" ; \
+	else \
+		az acr login \
+			--name ${AZURE_CONTAINER_REGISTRY} ; \
+	fi
 	az acr token create \
 		--name ${AZURE_ACR_USERNAME} \
 		--registry ${AZURE_CONTAINER_REGISTRY} \
