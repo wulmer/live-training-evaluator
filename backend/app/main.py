@@ -26,7 +26,7 @@ class ResultBase(SQLModel):
 
 class Result(ResultBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    last_updated: datetime | None = Field(
+    last_updated: datetime = Field(
         sa_column=Column(
             TIMESTAMP(timezone=True),
             nullable=False,
@@ -109,14 +109,14 @@ def create_result(
         return db_result
 
 
-@app.get("/results/")
+@app.get("/results/", response_model=list[ResultPublic])
 def read_results(
     session: SessionDep,
     label: str | None = None,
     maxAgeMin: int = 30,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
-) -> list[ResultPublic]:
+):
     statement = select(Result)
     if label is not None:
         statement = statement.where(Result.label == label)
@@ -127,8 +127,8 @@ def read_results(
     return results
 
 
-@app.get("/results/{result_id}")
-def read_result(result_id: int, session: SessionDep) -> ResultPublic:
+@app.get("/results/{result_id}", response_model=ResultPublic)
+def read_result(result_id: int, session: SessionDep):
     result = session.get(Result, result_id)
     if not result:
         raise HTTPException(status_code=404, detail="Result not found")
