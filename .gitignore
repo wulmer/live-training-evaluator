@@ -8,9 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
-backend/database.db
 
 # Secrets
 .envrc
-backend/.deployed-hostname.txt
-backend/.secret-acr-token

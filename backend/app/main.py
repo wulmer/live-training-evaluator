@@ -6,34 +6,34 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import (
     Column,
+    DateTime,
+    func,
     Field,
     Session,
     SQLModel,
-    create_engine,
     select,
-    TIMESTAMP,
-    text,
 )
+
+from app.db import get_db_engine
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "AIPEX2025")
 
 
 class ResultBase(SQLModel):
-    origin: str = Field(index=True)
-    label: str = Field(index=True)
+    origin: str = Field(max_length=100, index=True)
+    label: str = Field(max_length=100, index=True)
     value: float
 
 
 class Result(ResultBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     last_updated: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(
-            TIMESTAMP(timezone=True),
+            DateTime,
             nullable=False,
-            server_default=text("CURRENT_TIMESTAMP"),
-            onupdate=text("CURRENT_TIMESTAMP"),
+            onupdate=func.now(),
         ),
-        default=None,
     )
 
 
@@ -46,11 +46,7 @@ class ResultPublic(ResultBase):
     last_updated: datetime
 
 
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+engine = get_db_engine()
 
 
 def create_db_and_tables():
@@ -123,7 +119,9 @@ def read_results(
     if maxAgeMin is not None:
         max_age = datetime.now(timezone.utc) - timedelta(minutes=maxAgeMin)
         statement = statement.where(Result.last_updated >= max_age)
-    results = session.exec(statement.offset(offset).limit(limit))
+    results = session.exec(
+        statement.order_by(Result.origin).offset(offset).limit(limit)
+    )
     return results
 
 

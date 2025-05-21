@@ -1,0 +1,4 @@
+database.db
+.deployed-hostname.txt
+.secret-acr-token
+.sql-admin-password.txt
