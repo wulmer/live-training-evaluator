@@ -10,13 +10,14 @@
 
 	// Receive plot data as prop.
 	export let data: Data[] = [];
+	export let showLabels = true;
 
 	// The chart dimensions and margins as optional props.
 	let width = 1800;
 	export let height = 600;
 	export let marginTop = 30;
 	export let marginRight = 30;
-	export let marginBottom = 30;
+	export let marginBottom = 90;
 	export let marginLeft = 50;
 
 	// Create the x (horizontal position) scale.
@@ -101,20 +102,19 @@
 				y1={0}
 				y2={6}
 			/>
-
-			<!-- X - Axis Tick Labels-->
-			<text
-				fill="currentColor"
-				text-anchor="middle"
-				x={xScale(d.label) + xScale.bandwidth() / 2}
-				y={22}
-			>
-				{d.label}
-			</text>
+			{#if showLabels}
+				<!-- X - Axis Tick Labels-->
+				<text
+					fill="currentColor"
+					text-anchor="start"
+					transform="rotate(-90, {xScale(d.label) + xScale.bandwidth() / 2}, 22)"
+					x={xScale(d.label) + xScale.bandwidth() / 2}
+					y={22}
+				>
+					{d.label}
+				</text>
+			{/if}
 		{/each}
-
-		<!--X - Axis Label-->
-		<text fill="currentColor" x={width / 2} y={50}> label </text>
 	</g>
 
 	<!--Y - Axis-->

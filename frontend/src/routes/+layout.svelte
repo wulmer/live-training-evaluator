@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { LayoutProps } from './$types';
-	import { backendUrlStore, timeSpanMin } from '$lib/config.svelte';
+	import { backendUrlStore, timeSpanMin, showOrigins } from '$lib/config.svelte';
 	import { onMount } from 'svelte';
 
 	let { children, data }: LayoutProps = $props();
@@ -124,6 +124,16 @@
 					bind:value={$timeSpanMin}
 					placeholder="Time span filter"
 				/>
+			</div>
+		</div>
+	</div>
+	<div class="field is-horizontal">
+		<div class="field-label">
+			<label class="label" for="inputShowOrigins"> Show origins</label>
+		</div>
+		<div class="field-body">
+			<div class="control">
+				<input class="checkbox" type="checkbox" id="inputShowOrigins" bind:checked={$showOrigins} />
 			</div>
 		</div>
 	</div>

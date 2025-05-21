@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { backendUrlStore, timeSpanMin } from '$lib/config.svelte';
+	import { backendUrlStore, timeSpanMin, showOrigins } from '$lib/config.svelte';
 	import { page } from '$app/state';
 
 	import BarChart from '$lib/BarChart.svelte';
@@ -52,5 +52,5 @@
 
 <section class="section">
 	<h1 class="title">Evaluation: {page.params.label}</h1>
-	<BarChart {data} />
+	<BarChart {data} showLabels={$showOrigins} />
 </section>
