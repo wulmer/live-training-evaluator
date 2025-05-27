@@ -15,6 +15,8 @@ RUN \
   rm mssql-tools_17.10.1.1-1_amd64.apk ;\
   apk del curl
 
+RUN mkdir /app
+
 ADD .python-version pyproject.toml uv.lock /app
 
 WORKDIR /app
