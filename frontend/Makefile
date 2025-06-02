@@ -14,5 +14,6 @@ dev:
 	@if [ -f "../backend/.deployed-hostname.txt" ]; then \
 		echo "Backend is deployed under http://$$(<../backend/.deployed-hostname.txt):8000"; \
 	fi
+	@npm install
 	@BACKEND=$$(<../backend/.deployed-hostname.txt) npm run dev -- --open
 
