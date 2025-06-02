@@ -32,8 +32,9 @@ help:
 	@echo "  docker-run      Build and run the Docker container"
 	@echo "  docker-push     Build and push the Docker image to Azure Container Registry"
 	@echo "  deploy          Deploy the application to Azure Container Instance"
+	@echo "  status          Show the status of the Azure Container Instance"
 	@echo "  logs            Show logs of the Azure Container Instance"
-	@echo "  restart				 Restart the Azure Container Instance"
+	@echo "  restart         Restart the Azure Container Instance"
 	@echo "  swagger-url     Show the Swagger and Redoc URLs"
 	@echo "  delete          Delete the Azure Container Instance and Resource Group"
 	@echo ""
@@ -145,6 +146,12 @@ deploy:
 		--restart-policy OnFailure \
 		--output tsv \
 		--query "ipAddress.fqdn" | tee ${DEPLOYED_HOSTNAME_FILE}
+
+status:
+	 az container show \
+		--resource-group ${AZURE_RESOURCE_GROUP} \
+		--name ${AZURE_CONTAINER_NAME} \
+		| jq '.containers[0].instanceView.currentState'
 
 logs:
 	az container logs \
